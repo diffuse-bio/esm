@@ -13,7 +13,7 @@ from torch.nn import Parameter
 from esm.rotary_embedding import RotaryEmbedding
 
 import uuid
-import lora
+import loralib as lora
 import logging
 
 
