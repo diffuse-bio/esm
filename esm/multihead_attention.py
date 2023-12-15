@@ -13,6 +13,8 @@ from torch.nn import Parameter
 from esm.rotary_embedding import RotaryEmbedding
 
 import uuid
+import lora
+import logging
 
 
 def utils_softmax(x, dim: int, onnx_trace: bool = False):
@@ -84,6 +86,7 @@ class MultiheadAttention(nn.Module):
         self_attention: bool = False,
         encoder_decoder_attention: bool = False,
         use_rotary_embeddings: bool = False,
+        lora: bool = False,
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -105,12 +108,22 @@ class MultiheadAttention(nn.Module):
         assert not self.self_attention or self.qkv_same_dim, (
             "Self-attention requires query, key and " "value to be of the same size"
         )
+        if self.lora:
+            
+            self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
+            self.v_proj = lora.Linear(self.vdim, embed_dim, bias=bias)
+            self.q_proj = lora.Linear(embed_dim, embed_dim, bias=bias)
+            
+            logging.warning("LORA on out_proj for MHA")
+            self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias)
+            
+        else:
+            
+            self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
+            self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
+            self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
-        self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
-        self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-
-        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+            self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))

@@ -12,7 +12,7 @@ import torch.nn.functional as F
 
 from .multihead_attention import MultiheadAttention  # noqa
 from .axial_attention import ColumnSelfAttention, RowSelfAttention
-
+import loralib as lora
 
 def gelu(x):
     """Implementation of the gelu activation function.
@@ -92,6 +92,7 @@ class TransformerLayer(nn.Module):
         add_bias_kv=True,
         use_esm1b_layer_norm=False,
         use_rotary_embeddings: bool = False,
+        lora: bool = False,
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -109,11 +110,16 @@ class TransformerLayer(nn.Module):
             add_bias_kv=add_bias_kv,
             add_zero_attn=False,
             use_rotary_embeddings=self.use_rotary_embeddings,
+            lora=self.lora,
         )
         self.self_attn_layer_norm = BertLayerNorm(self.embed_dim)
 
-        self.fc1 = nn.Linear(self.embed_dim, self.ffn_embed_dim)
-        self.fc2 = nn.Linear(self.ffn_embed_dim, self.embed_dim)
+        if self.lora:
+            self.fc1 = lora.Linear(self.embed_dim, self.ffn_embed_dim)
+            self.fc2 = lora.Linear(self.ffn_embed_dim, self.embed_dim)
+        else:
+            self.fc1 = nn.Linear(self.embed_dim, self.ffn_embed_dim)
+            self.fc2 = nn.Linear(self.ffn_embed_dim, self.embed_dim)
 
         self.final_layer_norm = BertLayerNorm(self.embed_dim)
 
