@@ -92,14 +92,14 @@ class TransformerLayer(nn.Module):
         add_bias_kv=True,
         use_esm1b_layer_norm=False,
         use_rotary_embeddings: bool = False,
-        lora: bool = False,
+        use_lora: bool = False,
     ):
         super().__init__()
         self.embed_dim = embed_dim
         self.ffn_embed_dim = ffn_embed_dim
         self.attention_heads = attention_heads
         self.use_rotary_embeddings = use_rotary_embeddings
-        self.lora = lora
+        self.lora = use_lora
         self._init_submodules(add_bias_kv, use_esm1b_layer_norm)
 
     def _init_submodules(self, add_bias_kv, use_esm1b_layer_norm):
@@ -110,13 +110,16 @@ class TransformerLayer(nn.Module):
             add_bias_kv=add_bias_kv,
             add_zero_attn=False,
             use_rotary_embeddings=self.use_rotary_embeddings,
-            lora=self.lora,
+            use_lora=self.lora,
         )
         self.self_attn_layer_norm = BertLayerNorm(self.embed_dim)
 
         if self.lora:
             self.fc1 = lora.Linear(self.embed_dim, self.ffn_embed_dim)
             self.fc2 = lora.Linear(self.ffn_embed_dim, self.embed_dim)
+            # print the names of self.fc1 and fc2
+            # print(self.fc1)
+            # print(self.fc2)
         else:
             self.fc1 = nn.Linear(self.embed_dim, self.ffn_embed_dim)
             self.fc2 = nn.Linear(self.ffn_embed_dim, self.embed_dim)
