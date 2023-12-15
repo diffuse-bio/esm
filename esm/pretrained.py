@@ -217,7 +217,9 @@ def load_model_and_alphabet_core(model_name, model_data, regression_data=None, u
                 "Regression weights not found, predicting contacts will not produce correct results."
             )
 
-    model.load_state_dict(model_state, strict=regression_data is not None)
+
+    # allow for the model to load only a subset of the weights (no lora weights in pretrained dict)
+    model.load_state_dict(model_state, strict=(regression_data is not None) and (not use_lora))
 
     return model, alphabet
 
