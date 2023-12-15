@@ -115,8 +115,8 @@ class TransformerLayer(nn.Module):
         self.self_attn_layer_norm = BertLayerNorm(self.embed_dim)
 
         if self.lora:
-            self.fc1 = lora.Linear(self.embed_dim, self.ffn_embed_dim)
-            self.fc2 = lora.Linear(self.ffn_embed_dim, self.embed_dim)
+            self.fc1 = lora.Linear(self.embed_dim, self.ffn_embed_dim, r=16)
+            self.fc2 = lora.Linear(self.ffn_embed_dim, self.embed_dim, r=16)
             # print the names of self.fc1 and fc2
             # print(self.fc1)
             # print(self.fc2)
