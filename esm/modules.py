@@ -100,6 +100,7 @@ class TransformerLayer(nn.Module):
         self.attention_heads = attention_heads
         self.use_rotary_embeddings = use_rotary_embeddings
         self._init_submodules(add_bias_kv, use_esm1b_layer_norm)
+        self.lora = lora
 
     def _init_submodules(self, add_bias_kv, use_esm1b_layer_norm):
         BertLayerNorm = ESM1bLayerNorm if use_esm1b_layer_norm else ESM1LayerNorm
