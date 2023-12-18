@@ -87,6 +87,7 @@ class MultiheadAttention(nn.Module):
         encoder_decoder_attention: bool = False,
         use_rotary_embeddings: bool = False,
         use_lora: bool = False,
+        r: int = 16,
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -105,6 +106,7 @@ class MultiheadAttention(nn.Module):
         self.self_attention = self_attention
         self.encoder_decoder_attention = encoder_decoder_attention
         self.lora = use_lora
+        self.r = r
 
         assert not self.self_attention or self.qkv_same_dim, (
             "Self-attention requires query, key and " "value to be of the same size"
@@ -112,11 +114,11 @@ class MultiheadAttention(nn.Module):
         if self.lora:
             
             self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
-            self.v_proj = lora.Linear(self.vdim, embed_dim, bias=bias, r=16)
-            self.q_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=16)
+            self.v_proj = lora.Linear(self.vdim, embed_dim, bias=bias, r=self.r)
+            self.q_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
             
             logging.warning("LORA on out_proj for MHA")
-            self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=16)
+            self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
             
             # print(self.v_proj)
             # print(self.q_proj)
