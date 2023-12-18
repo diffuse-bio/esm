@@ -20,6 +20,7 @@ class ESM2(nn.Module):
         alphabet: Union[esm.data.Alphabet, str] = "ESM-1b",
         token_dropout: bool = True,
         use_lora: bool = False,
+        r: int = 16,
     ):
         super().__init__()
         self.num_layers = num_layers
@@ -37,6 +38,7 @@ class ESM2(nn.Module):
         self.append_eos = alphabet.append_eos
         self.token_dropout = token_dropout
         self.lora = use_lora
+        self.r = r
 
         self._init_submodules()
 
@@ -58,6 +60,7 @@ class ESM2(nn.Module):
                     use_esm1b_layer_norm=True,
                     use_rotary_embeddings=True,
                     use_lora=self.lora,
+                    r=self.r
                 )
                 for _ in range(self.num_layers)
             ]
