@@ -115,10 +115,10 @@ class MultiheadAttention(nn.Module):
             
             self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
             self.v_proj = lora.Linear(self.vdim, embed_dim, bias=bias, r=self.r)
-            self.q_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
+            # self.q_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
             
-            logging.warning("LORA on out_proj for MHA")
-            self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
+            logging.warning("LORA on k_proj and v_proj only for MHA")
+            # self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
             
             # print(self.v_proj)
             # print(self.q_proj)
