@@ -112,6 +112,7 @@ class MultiheadAttention(nn.Module):
             "Self-attention requires query, key and " "value to be of the same size"
         )
         
+        # lora block
         if 'k' in self.lora:       
             logging.warning(f"LORA on k_proj for MHA")     
             self.k_proj = lora.Linear(self.kdim, embed_dim, bias=bias, r=self.r)
@@ -131,14 +132,6 @@ class MultiheadAttention(nn.Module):
             logging.warning(f"LORA on out_proj for MHA")   
             self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
         else:
-            self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-                        
-        else:
-            
-            self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
-            self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
-            self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-
             self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
         if add_bias_kv:
