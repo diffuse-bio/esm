@@ -86,7 +86,7 @@ class MultiheadAttention(nn.Module):
         self_attention: bool = False,
         encoder_decoder_attention: bool = False,
         use_rotary_embeddings: bool = False,
-        use_lora: bool = False,
+        use_lora: list = [],
         r: int = 16,
     ):
         super().__init__()
@@ -111,21 +111,28 @@ class MultiheadAttention(nn.Module):
         assert not self.self_attention or self.qkv_same_dim, (
             "Self-attention requires query, key and " "value to be of the same size"
         )
-        if self.lora:
-            
+        
+        if 'k' in self.lora:       
+            logging.warning(f"LORA on k_proj for MHA")     
             self.k_proj = lora.Linear(self.kdim, embed_dim, bias=bias, r=self.r)
+        else: 
+            self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
+        if 'v' in self.lora:
+            logging.warning(f"LORA on v_proj for MHA")   
             self.v_proj = lora.Linear(self.vdim, embed_dim, bias=bias, r=self.r)
-            # self.q_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
+        else: 
+            self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
+        if 'q' in self.lora:
+            logging.warning(f"LORA on q_proj for MHA")   
+            self.q_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
+        else:
             self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-            
-            logging.warning("LORA on k_proj and v_proj only for MHA")
+        if 'out' in self.lora:
+            logging.warning(f"LORA on out_proj for MHA")   
+            self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
+        else:
             self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-            # self.out_proj = lora.Linear(embed_dim, embed_dim, bias=bias, r=self.r)
-            
-            # print(self.v_proj)
-            # print(self.q_proj)
-            # print(self.out_proj)
-            
+                        
         else:
             
             self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)

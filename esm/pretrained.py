@@ -59,7 +59,7 @@ def _download_model_and_regression_data(model_name):
     return model_data, regression_data
 
 
-def load_model_and_alphabet_hub(model_name, use_lora=False, r=16):
+def load_model_and_alphabet_hub(model_name, use_lora=[], r=16):
     model_data, regression_data = _download_model_and_regression_data(model_name)
     return load_model_and_alphabet_core(model_name, model_data, regression_data, use_lora=use_lora, r=r)
 
@@ -161,7 +161,7 @@ def _load_model_and_alphabet_core_v1(model_data):
     return model, alphabet, model_state
 
 
-def _load_model_and_alphabet_core_v2(model_data, use_lora=False, r=16):
+def _load_model_and_alphabet_core_v2(model_data, use_lora=[], r=16):
     def upgrade_state_dict(state_dict):
         """Removes prefixes 'model.encoder.sentence_encoder.' and 'model.encoder.'."""
         prefixes = ["encoder.sentence_encoder.", "encoder."]
@@ -185,7 +185,7 @@ def _load_model_and_alphabet_core_v2(model_data, use_lora=False, r=16):
     return model, alphabet, state_dict
 
 
-def load_model_and_alphabet_core(model_name, model_data, regression_data=None, use_lora=False, r=16):
+def load_model_and_alphabet_core(model_name, model_data, regression_data=None, use_lora=[], r=16):
     if regression_data is not None:
         model_data["model"].update(regression_data["model"])
 
@@ -351,7 +351,7 @@ def esm_if1_gvp4_t16_142M_UR50():
     return load_model_and_alphabet_hub("esm_if1_gvp4_t16_142M_UR50")
 
 
-def esm2_t6_8M_UR50D(use_lora=False, r=16):
+def esm2_t6_8M_UR50D(use_lora=[], r=16):
     """6 layer ESM-2 model with 8M params, trained on UniRef50.
 
     Returns a tuple of (Model, Alphabet).
@@ -359,7 +359,7 @@ def esm2_t6_8M_UR50D(use_lora=False, r=16):
     return load_model_and_alphabet_hub("esm2_t6_8M_UR50D", use_lora=use_lora, r=r)
 
 
-def esm2_t12_35M_UR50D(use_lora=False, r=16):
+def esm2_t12_35M_UR50D(use_lora=[], r=16):
     """12 layer ESM-2 model with 35M params, trained on UniRef50.
 
     Returns a tuple of (Model, Alphabet).
@@ -367,7 +367,7 @@ def esm2_t12_35M_UR50D(use_lora=False, r=16):
     return load_model_and_alphabet_hub("esm2_t12_35M_UR50D", use_lora=use_lora, r=r)
 
 
-def esm2_t30_150M_UR50D(use_lora=False, r=16):
+def esm2_t30_150M_UR50D(use_lora=[], r=16):
     """30 layer ESM-2 model with 150M params, trained on UniRef50.
 
     Returns a tuple of (Model, Alphabet).
@@ -375,7 +375,7 @@ def esm2_t30_150M_UR50D(use_lora=False, r=16):
     return load_model_and_alphabet_hub("esm2_t30_150M_UR50D", use_lora=use_lora, r=r)
 
 
-def esm2_t33_650M_UR50D(use_lora=False, r=16):
+def esm2_t33_650M_UR50D(use_lora=[], r=16):
     """33 layer ESM-2 model with 650M params, trained on UniRef50.
 
     Returns a tuple of (Model, Alphabet).
@@ -383,7 +383,7 @@ def esm2_t33_650M_UR50D(use_lora=False, r=16):
     return load_model_and_alphabet_hub("esm2_t33_650M_UR50D", use_lora=use_lora, r=r)
 
 
-def esm2_t36_3B_UR50D(use_lora=False, r=16):
+def esm2_t36_3B_UR50D(use_lora=[], r=16):
     """36 layer ESM-2 model with 3B params, trained on UniRef50.
 
     Returns a tuple of (Model, Alphabet).
@@ -391,7 +391,7 @@ def esm2_t36_3B_UR50D(use_lora=False, r=16):
     return load_model_and_alphabet_hub("esm2_t36_3B_UR50D", use_lora=use_lora, r=r)
 
 
-def esm2_t48_15B_UR50D(use_lora=False, r=16):
+def esm2_t48_15B_UR50D(use_lora=[], r=16):
     """48 layer ESM-2 model with 15B params, trained on UniRef50.
     If you have OOM while loading this model, please refer to README
     on how to employ FSDP and ZeRO CPU offloading

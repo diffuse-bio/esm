@@ -19,7 +19,7 @@ class ESM2(nn.Module):
         attention_heads: int = 20,
         alphabet: Union[esm.data.Alphabet, str] = "ESM-1b",
         token_dropout: bool = True,
-        use_lora: bool = False,
+        use_lora: list = [],
         r: int = 16,
     ):
         super().__init__()
