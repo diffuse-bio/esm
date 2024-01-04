@@ -21,6 +21,7 @@ class ESM2(nn.Module):
         token_dropout: bool = True,
         use_lora: list = [],
         r: int = 16,
+        n_lora_layers: int = 33,
     ):
         super().__init__()
         self.num_layers = num_layers
@@ -39,6 +40,7 @@ class ESM2(nn.Module):
         self.token_dropout = token_dropout
         self.lora = use_lora
         self.r = r
+        self.n_lora_layers = n_lora_layers
 
         self._init_submodules()
 
@@ -50,6 +52,7 @@ class ESM2(nn.Module):
             padding_idx=self.padding_idx,
         )
 
+        # only use lora for the last n_lora_layers
         self.layers = nn.ModuleList(
             [
                 TransformerLayer(
@@ -62,7 +65,18 @@ class ESM2(nn.Module):
                     use_lora=self.lora,
                     r=self.r
                 )
-                for _ in range(self.num_layers)
+                if num_layers - layer <= self.n_lora_layers
+                else TransformerLayer(
+                    self.embed_dim,
+                    4 * self.embed_dim,
+                    self.attention_heads,
+                    add_bias_kv=False,
+                    use_esm1b_layer_norm=True,
+                    use_rotary_embeddings=True,
+                    use_lora=[],
+                    r=self.r
+                )
+                for layer in range(self.num_layers)
             ]
         )
 
