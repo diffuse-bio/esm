@@ -65,7 +65,7 @@ class ESM2(nn.Module):
                     use_lora=self.lora,
                     r=self.r
                 )
-                if num_layers - layer <= self.n_lora_layers
+                if self.num_layers - layer <= self.n_lora_layers
                 else TransformerLayer(
                     self.embed_dim,
                     4 * self.embed_dim,
